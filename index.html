@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7fa">
+  <meta name="description" content="张雪峰大冒险 Unity WebGL 版">
+  <title>张雪峰大冒险</title>
+  <link rel="icon" href="TemplateData/favicon.ico">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      background: #f5f7fa;
+      color: #17202a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #f5f7fa;
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 64px;
+      padding: 10px clamp(14px, 3vw, 36px);
+      border-bottom: 1px solid #dfe5eb;
+      background: #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 11px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border-radius: 6px;
+      background: #e84435;
+      color: #ffffff;
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .brand-copy { min-width: 0; }
+
+    .brand-title {
+      display: block;
+      overflow: hidden;
+      font-size: 17px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      display: block;
+      margin-top: 2px;
+      color: #68737d;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .links a,
+    .fullscreen-button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid #cfd7df;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #25313c;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 18px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .links a:hover,
+    .fullscreen-button:hover {
+      border-color: #6b7782;
+      background: #f0f3f6;
+    }
+
+    .links a:focus-visible,
+    .fullscreen-button:focus-visible {
+      outline: 3px solid rgba(0, 149, 199, 0.25);
+      outline-offset: 2px;
+    }
+
+    main {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: clamp(12px, 2.5vw, 28px);
+    }
+
+    .game-shell {
+      position: relative;
+      width: min(100%, calc((100vh - 154px) * 1.6));
+      width: min(100%, calc((100dvh - 154px) * 1.6));
+      max-width: 1280px;
+      aspect-ratio: 8 / 5;
+      overflow: hidden;
+      border: 1px solid #cbd4dc;
+      border-radius: 8px;
+      background: #111820;
+      box-shadow: 0 18px 45px rgba(30, 43, 54, 0.16);
+    }
+
+    #unity-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #111820;
+    }
+
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      gap: 14px;
+      padding: 24px;
+      background: #111820;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .loading-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      width: min(280px, 64vw);
+      height: 7px;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #34424f;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: #e84435;
+      transition: width 120ms linear;
+    }
+
+    .fullscreen-button {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      border-color: rgba(255, 255, 255, 0.32);
+      background: rgba(17, 24, 32, 0.82);
+      color: #ffffff;
+      backdrop-filter: blur(8px);
+    }
+
+    #unity-warning {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      z-index: 3;
+    }
+
+    #unity-warning div {
+      margin-bottom: 6px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #fff4cc;
+      color: #5f4700;
+      font-size: 13px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 16px;
+      border-top: 1px solid #dfe5eb;
+      color: #6a7580;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    footer a { color: #263746; }
+
+    @media (max-width: 640px) {
+      .topbar { min-height: 58px; }
+      .brand-mark { width: 34px; height: 34px; font-size: 18px; }
+      .brand-subtitle { display: none; }
+      .links a { padding-inline: 9px; }
+      main { padding: 0; align-items: center; }
+      .game-shell {
+        width: 100%;
+        max-width: none;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      footer { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">雪</span>
+      <span class="brand-copy">
+        <strong class="brand-title">张雪峰大冒险</strong>
+        <span class="brand-subtitle">Unity WebGL</span>
+      </span>
+    </div>
+    <nav class="links" aria-label="项目链接">
+      <a href="https://github.com/Dr-hydra/xuefeng-adventure" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://github.com/Dr-hydra/xuefeng-adventure/issues" target="_blank" rel="noreferrer">Issues</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="game-shell" aria-label="游戏画面">
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+      <div id="unity-loading" class="loading">
+        <div class="loading-title">正在加载游戏</div>
+        <div class="progress-track"><div id="unity-progress" class="progress-bar"></div></div>
+      </div>
+      <div id="unity-warning"></div>
+      <button id="unity-fullscreen" class="fullscreen-button" type="button">全屏</button>
+    </section>
+  </main>
+
+  <footer>
+    <span>开源 WebGL 版本</span>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/Dr-hydra/xuefeng-adventure" target="_blank" rel="noreferrer">查看仓库</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/Dr-hydra/xuefeng-adventure/issues" target="_blank" rel="noreferrer">提交问题</a>
+  </footer>
+
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loading = document.querySelector("#unity-loading");
+    const progressBar = document.querySelector("#unity-progress");
+    const fullscreenButton = document.querySelector("#unity-fullscreen");
+    const warningBanner = document.querySelector("#unity-warning");
+
+    function unityShowBanner(message, type) {
+      const item = document.createElement("div");
+      item.textContent = message;
+      if (type === "error") item.style.background = "#ffd8d4";
+      warningBanner.appendChild(item);
+      if (type !== "error") {
+        setTimeout(() => item.remove(), 5000);
+      }
+    }
+
+    const buildUrl = "Build";
+    const config = {
+      dataUrl: buildUrl + "/WebGLPublish.data",
+      frameworkUrl: buildUrl + "/WebGLPublish.framework.js",
+      codeUrl: buildUrl + "/WebGLPublish.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DrHydra",
+      productName: "Xuefeng Adventure",
+      productVersion: "1.0",
+      showBanner: unityShowBanner
+    };
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      config.devicePixelRatio = 1;
+    }
+
+    const loader = document.createElement("script");
+    loader.src = buildUrl + "/WebGLPublish.loader.js";
+    loader.onload = () => {
+      createUnityInstance(canvas, config, progress => {
+        progressBar.style.width = `${Math.round(progress * 100)}%`;
+      }).then(unityInstance => {
+        loading.remove();
+        fullscreenButton.addEventListener("click", () => unityInstance.SetFullscreen(1));
+      }).catch(error => {
+        unityShowBanner(String(error), "error");
+      });
+    };
+    loader.onerror = () => unityShowBanner("游戏加载器下载失败，请刷新页面重试。", "error");
+    document.body.appendChild(loader);
+  </script>
+</body>
+</html>
